@@ -1,34 +1,58 @@
-This is a [Next.js](https://nextjs.org/) project bootstrapped with [`create-next-app`](https://github.com/vercel/next.js/tree/canary/packages/create-next-app).
+## Bug report
 
-## Getting Started
+### Verify canary release
 
-First, run the development server:
+- [X] I verified that the issue exists in the latest Next.js canary release
 
-```bash
-npm run dev
-# or
-yarn dev
-```
+### Provide environment information
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+    Operating System:
+      Platform: win32
+      Arch: x64
+      Version: Windows 10 Pro
+    Binaries:
+      Node: 16.17.1
+      npm: N/A
+      Yarn: N/A
+      pnpm: N/A
+    Relevant packages:
+      next: 13.0.7-canary.0
+      eslint-config-next: 13.0.7-canary.0
+      react: 18.2.0
+      react-dom: 18.2.0
 
-You can start editing the page by modifying `pages/index.tsx`. The page auto-updates as you edit the file.
+### Which area(s) of Next.js are affected? (leave empty if unsure)
 
-[API routes](https://nextjs.org/docs/api-routes/introduction) can be accessed on [http://localhost:3000/api/hello](http://localhost:3000/api/hello). This endpoint can be edited in `pages/api/hello.ts`.
+App directory (appDir: true), Routing (next/router, next/navigation, next/link)
 
-The `pages/api` directory is mapped to `/api/*`. Files in this directory are treated as [API routes](https://nextjs.org/docs/api-routes/introduction) instead of React pages.
+### Link to reproduction - Issues with a link to complete (but minimal) reproduction code will be addressed faster
 
-## Learn More
+https://github.com/schimi-dev/router-refresh-bug-report
 
-To learn more about Next.js, take a look at the following resources:
+### To Reproduce
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
+1. Do a hard reload in the browser on http://localhost:3000 (Homepage).
+2. Navigate via Next Link or `router.push` (one of the red controls) to the details page. 
+3. Change the name and submit the form.
 
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js/) - your feedback and contributions are welcome!
+A successful form submit sets a success state via `useState` hook, that leads to a box underneath the form becoming green instead of grey. After `router.refresh` completes, that state is lost and the box becomes grey again. In subsequent form submits this does no longer occurr and the box remains green.
 
-## Deploy on Vercel
+If the details page was entered either via a hard reload in the browser, or via `router.push` and `router.refresh` wrapped in `startTransition`, this problem does not occur. This can be tested with the green control on http://localhost:3000.
 
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
+The problem can be reproduced in development when started via `next dev` and in production when the built app is started via `next start`.
 
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/deployment) for more details.
+### Describe the Bug
+
+When calling `router.refresh` on a page that was visited via soft navigation (Next.js Link or `router.push`), the state that was set on that page is lost after `router.refresh` is completed. 
+
+### Expected Behavior
+
+No state should be lost after calling `router.refresh` regardless of how the page calling `router.refresh` was visited. In the example provided the box should remain green after `router.refresh` completes.
+
+### Which browser are you using? (if relevant)
+
+Chrome 108.0.5359.71
+
+### How are you deploying your application? (if relevant)
+
+Reproducible with `next dev` and `next start`
