@@ -3,7 +3,6 @@ import React from 'react';
 import HardNavigation from "./HardNavigation";
 import SoftNavigation from "./SoftNavigation";
 
-
 export default async function Page() {
 
     return (

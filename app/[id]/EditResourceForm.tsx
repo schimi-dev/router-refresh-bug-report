@@ -1,9 +1,10 @@
 'use client';
 
 import { useRouter } from "next/navigation";
-import { useState } from "react";
+import { SyntheticEvent, useState } from "react";
+import { TResource } from "../../types";
 
-const saveAction = async (data: { name: string }) => {
+const saveAction = async (data: TResource) => {
     return fetch("/api/resource", {
         method: "PATCH",
         headers: {
@@ -13,18 +14,20 @@ const saveAction = async (data: { name: string }) => {
     })
 }
 
-export default function EditResourceForm({ resource }: { resource: { name: string } | null }) {
+export default function EditResourceForm({ resource }: { resource: TResource | null }) {
 
     const router = useRouter();
 
     const [success, setSuccess] = useState(false);
 
-    const onSubmit = async (e: any) => {
+    const onSubmit = async (e: SyntheticEvent) => {
         e.preventDefault();
-        const data = {
-            name: (e.target.name.value as string),
+        const target = e.target as typeof e.target & {
+            name: { value: string };
         };
-
+        const data = {
+            name: (target.name.value as string),
+        };
         await saveAction(data);
         setSuccess(true);
         router.refresh()
@@ -35,8 +38,10 @@ export default function EditResourceForm({ resource }: { resource: { name: strin
             <h1>Edit resource</h1>
             <div style={{ borderStyle: "solid", borderWidth: 1, padding: 16, marginBottom: 16 }}>
                 <form onSubmit={onSubmit} >
-                    <label htmlFor="name">Name</label>
-                    <input style={{ display: "block" }} name="name" defaultValue={resource?.name || ""}></input>
+                    <label>
+                        Name
+                        <input style={{ display: "block" }} name="name" defaultValue={resource?.name || ""}></input>
+                    </label>
                     <div>
                         <button type="submit">Save</button>
                     </div>
@@ -46,6 +51,5 @@ export default function EditResourceForm({ resource }: { resource: { name: strin
                 {success ? "Success state" : "Initial state"}
             </div>
         </div >
-
     )
 }

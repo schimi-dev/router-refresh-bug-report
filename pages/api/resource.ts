@@ -6,5 +6,5 @@ export default async function handler(
     res: NextApiResponse<void>
 ) {
     await updateResource(req.body.name as string);
-    res.status(204).end();
+    res.status(201).end();
 }
