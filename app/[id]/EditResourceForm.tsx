@@ -26,7 +26,7 @@ export default function EditResourceForm({ resource }: { resource: TResource | n
             name: { value: string };
         };
         const data = {
-            name: (target.name.value as string),
+            name: target.name.value,
         };
         await saveAction(data);
         setSuccess(true);
